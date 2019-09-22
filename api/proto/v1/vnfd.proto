@@ -1,0 +1,96 @@
+syntax = "proto3";
+package v1;
+
+import "google/protobuf/timestamp.proto";
+
+message Vdu {
+    string vcpus = 1;
+    string memory = 2;
+    string disk_size = 3;
+    string image = 4;
+    string name = 5;
+    repeated Vnfc vnfcs = 6;
+}
+
+message VirtualLink {
+    string name = 1;
+    bool is_management = 2;
+}
+
+message VnfdPostTemplate {
+    string name = 1;
+    repeated Vdu vdus = 2;
+    repeated VirtualLink virtual_links = 3;
+}
+
+message VnfdInstanceTemplate {
+    string id = 1;
+    string status = 2;
+    google.protobuf.Timestamp created_at = 3;
+    google.protobuf.Timestamp updated_at = 4;
+    VnfdPostTemplate vnfd = 10;
+}
+
+message PaginatedVnfdInstanceTemplate {
+    uint32 limit = 1;
+    uint32 total_count = 2;
+    string first = 3;
+    string next = 4;
+    repeated VnfdInstanceTemplate vnfds = 5;
+}
+
+message Vnfc {
+    string name = 1;
+    repeated ConnectionPoint connection_points = 2;
+}
+
+message ConnectionPoint {
+    string name = 1;
+    string ip_address = 2;
+    repeated string virtual_link_reference = 3;
+}
+
+message CreateRequest {
+    string api = 1;
+    VnfdPostTemplate vnfd = 2;
+}
+
+message CreateResponse {
+    string api = 1;
+    VnfdInstanceTemplate vnfd = 10;
+}
+
+message GetRequest {
+    string api = 1;
+    string id = 2;
+}
+
+message GetResponse {
+    string api = 1;
+    VnfdInstanceTemplate vnfd = 2;
+}
+
+message ListRequest {
+    string api = 1;
+}
+
+message ListResponse {
+    string api = 1;
+    repeated PaginatedVnfdInstanceTemplate paginated_vnfds = 10;
+}
+
+message DeleteRequest {
+    string api = 1;
+    string id = 2;
+}
+
+message DeleteResponse {
+
+}
+
+service VnfdService {
+    rpc Create(CreateRequest) returns (CreateResponse);
+    rpc Get(GetRequest) returns (GetResponse);
+    rpc List(ListRequest) returns (ListResponse);
+    rpc Delete(DeleteRequest) returns (DeleteResponse);
+}
